@@ -1,80 +1,188 @@
-Here is a polished, professional version of your README. It uses clear hierarchy, badges, and clean formatting to make it look "production-ready" for GitHub.
+# RWA Cashflow Settlement Infrastructure (Avalanche)
+
+## Overview
+
+This repository implements **issuer-grade infrastructure for representing, accounting for, and settling real‑world cashflows on-chain**, using Avalanche and USDC.
+
+The system is designed around a simple but strict principle:
+
+> **Real-world cashflows should be provably reflected on-chain without exposing private keys or forcing investor custody.**
+
+Rather than building a marketplace or fund abstraction, this project focuses on the **plumbing layer** required for real‑world debt and yield instruments to exist credibly on-chain.
 
 ---
 
-# Structured RWA Note Tokenization Infrastructure
+## What This Is (and Is Not)
 
-A controlled, institution-oriented framework for tokenizing **Real-World Asset (RWA)** debt instruments. Designed for SPV-driven issuance, tranche-based risk modeling, and restricted transfer mechanics.
+### This **IS**:
 
-> **Note:** This system optimizes for control, structure, and institutional deployability over retail accessibility. It is designed as **infrastructure**, not a marketplace.
+* Cashflow-first RWA infrastructure
+* Issuer‑driven accounting and settlement logic
+* Deterministic, on‑chain yield computation
+* Institutional control model (operator executes, investors observe)
+* USDC‑native settlement on Avalanche
 
----
+### This is **NOT**:
 
-## 🏗️ Architecture Overview
-
-The system is built to handle the complexities of private credit, real estate-backed notes, and non-retail financial instruments.
-
-### Key Pillars
-
-* **SPV-Centric Issuance:** Clear legal and technical separation between the Issuer (SPV) and the Investors.
-* **Deterministic Yield:** Auditable, on-chain accounting for interest accrual and principal repayment.
-* **Institutional Compliance:** Restricted transfer mechanics aligned with KYC/AML and custody requirements.
-* **Subnet-Ready:** Designed for seamless migration from C-Chain to dedicated Avalanche Subnets for complete institutional isolation.
+* A DeFi yield protocol
+* A governance token system
+* A marketplace or exchange
+* A custody solution for investors
 
 ---
 
-## 🛠️ Tech Stack
+## Core Problem
 
-| Component | Technology | Role |
-| --- | --- | --- |
-| **Smart Contracts** | Vyper | ERC-1155 style tranche tokens |
-| **Backend** | Python / Django | Admin tooling & investor dashboards |
-| **Data Integrity** | IPFS + SHA-256 | Immutable document & metadata storage |
-| **Network** | Avalanche | Fuji Testnet (Subnet-compatible architecture) |
+Most RWA implementations focus on **token representation**, not **cashflow integrity**.
 
----
+In real finance:
 
-## 🚀 Getting Started
+* Cashflows are periodic
+* Payouts are issuer-controlled
+* Investors do not sign transactions
+* Yield must be auditable
 
-### Prerequisites
+Current on‑chain systems do not model this cleanly.
 
-* [Foundry](https://book.getfoundry.sh/getting-started/installation) or [Titanoboa](https://github.com/vyperlang/titanoboa) for smart contract development.
-* Python 3.10+ for the administrative backend.
-
-### Quick Install
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/your-username/rwa-note-infrastructure.git
-cd rwa-note-infrastructure
-
-```
-
-
-2. **Install Dependencies**
-```bash
-# Install Vyper dependencies
-pip install -r requirements.txt
-
-```
-
-
-3. **Deploy to Fuji (Testnet)**
-```bash
-# Example deployment command (update with your script)
-python scripts/deploy.py --network fuji
-
-```
-
-
+This project fills that gap.
 
 ---
 
-## ⚖️ Compliance & Governance
+## High‑Level Architecture
 
-This infrastructure assumes a **permissioned environment**. All transfers are gated by a `TransferController` contract, ensuring that assets only move between whitelisted, KYC-verified addresses.
+The system is intentionally split into two operational planes:
 
-* **Admin Role:** Manages the lifecycle of the SPV and triggers distributions.
-* **Investor Role:** Restricted to viewing data and secondary transfers within the whitelist.
+### 1. SPV / Operator Plane (Execution)
+
+* Controlled by the issuer (SPV)
+* Holds the private key (Isolated from hacks)
+* Executes on‑chain actions:
+
+  * Token minting
+  * Recording deposits
+  * Distributing yield
+* Implemented as a Django service + Vyper contracts
+
+### 2. Investor Plane (Observation)
+
+* No private keys
+* No transaction signing
+* Fully read‑only
+* Syncs directly from Avalanche Blockchain (Fuji in this reference)
+* Displays:
+
+  * Token balances
+  * Accrued yield
+  * Distribution history
+
+This separation is **intentional** and mirrors institutional finance workflows.
 
 ---
+
+## On‑Chain Components
+
+### Smart Contracts (Vyper)
+
+Key properties:
+
+* ERC‑1155‑like multi‑token structure
+* Each token ID represents a discrete cashflow instrument (e.g. a loan tranche)
+* Transfers disabled by default (issuer‑controlled lifecycle)
+* Yield computed deterministically on‑chain
+* USDC used as the sole settlement asset
+
+The contract does **not** attempt to manage:
+
+* Compliance
+* KYC
+* Off‑chain payment rails
+
+Its responsibility is **state correctness**, not regulation.
+
+---
+
+## Off‑Chain Components
+
+### Django (Operator / SPV)
+
+* Creates instruments
+* Mints tokenized positions
+* Triggers on‑chain distributions
+* Mirrors real‑world borrower payments
+
+### Django (Investor)
+
+* Indexes on‑chain data
+* Displays balances and yield
+* Provides verifiable proof of ownership and earnings
+
+No investor private keys are ever handled.
+
+---
+
+## Cashflow Lifecycle (End‑to‑End)
+
+1. SPV creates a real‑world loan off‑chain
+2. SPV deploys a corresponding on‑chain instrument
+3. Tokens representing slices of cashflow are minted
+4. Borrower makes payments off‑chain
+5. SPV mirrors payments on‑chain using USDC
+6. Contract updates accrued yield
+7. Investors observe yield on-chain
+8. Payouts occur at maturity or scheduled intervals
+
+Every material state transition is verifiable on Avalanche.
+
+---
+
+## Why Avalanche
+
+Avalanche is uniquely suited for this model due to:
+
+* Native USDC liquidity
+* Fast, deterministic finality
+* Institutional focus (Evergreen, Vista, Subnets)
+* Flexibility for issuer‑controlled execution
+
+This infrastructure is designed to integrate naturally into Avalanche’s RWA and institutional roadmap.
+
+---
+
+## Intended Use Cases
+
+* Real Estate debt
+* Private credit
+* Revenue‑based financing
+* Structured notes
+* Asset‑backed debt
+* Institutional RWA pilots
+
+---
+
+## Status
+
+* Core contracts implemented in Vyper
+* Deployment and interaction via Django complete
+* Investor sync and read‑only dashboards implemented
+* Designed for testnet and pilot deployment
+
+---
+
+## Design Philosophy
+
+* Cashflow > token hype
+* Determinism > governance
+* Infrastructure > abstraction
+* Proof > permission
+
+---
+
+## Disclaimer
+
+This repository represents infrastructure tooling and does not constitute an investment product, offering, or solicitation. Regulatory compliance is the responsibility of the issuer.
+
+---
+
+## Contact
+
+Built as issuer‑grade infrastructure for on‑chain cashflow settlement on Avalanche.
