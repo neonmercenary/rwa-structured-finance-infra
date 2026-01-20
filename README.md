@@ -48,60 +48,106 @@ This project fills that gap.
 
 ---
 ## Project Structore (DIR TREE)
+<details>
 
-rwa-cashflow-infra/
-│
+  <summary>Click to view directory structure</summary>
+
+
+  ```text
+
+  rwa-cashflow-infra/
+
 ├── README.md
+
 ├── GRANT_MEMO.md
+
 ├── WHITEPAPER.md
-│
+
 ├── contracts/
+
 │   ├── RWA1155.vy
-│   └── README.md
-│
-├── artifacts/
-│   ├── RWA1155.abi.json
-│   └── RWA1155.address
-│
-├── deploy/
-│   └── deploy_rwa.py
-│
+
+│   ├── README.md
+
+│   ├── artifacts/
+
+│   │   ├── RWA1155.abi.json
+
+│   │   └── RWA1155.address
+
+│   └── deploy/
+
+│       └── deploy_rwa.py
+
 ├── spv_admin/
+
 │   ├── manage.py
+
 │   ├── requirements.txt
+
 │   ├── spv_admin/
+
 │   │   ├── settings.py
+
 │   │   ├── urls.py
+
 │   │   └── wsgi.py
+
 │   └── app/
+
 │       ├── models.py
+
 │       ├── views.py
+
 │       ├── urls.py
+
 │       ├── templates/
+
 │       │   └── admin/
+
 │       └── blockchain/
+
 │           ├── client.py
+
 │           └── avax.py
-│
+
 ├── investor_portal/
+
 │   ├── manage.py
+
 │   ├── requirements.txt
+
 │   ├── investor_portal/
+
 │   │   ├── settings.py
+
 │   │   ├── urls.py
+
 │   │   └── wsgi.py
+
 │   └── app/
+
 │       ├── models.py
+
 │       ├── views.py
+
 │       ├── urls.py
+
 │       ├── templates/
+
 │       │   └── investor/
+
 │       └── blockchain/
+
 │           └── reader.py
-│
+
 └── diagrams/
+
     └── system_flow.png
 
+  ```
+
+</details>
 ---
 
 ## High‑Level Architecture
